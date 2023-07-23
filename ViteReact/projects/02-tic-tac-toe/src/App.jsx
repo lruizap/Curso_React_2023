@@ -9,7 +9,7 @@ import { saveGameToStorage, resetGameStorage } from './logic/storage/index.js'
 import './App.css'
 
 function App() {
-  //* Los hoocks nunca pueden ir dentro de un if
+  //* Los hooks nunca pueden ir dentro de un if
   //* porque react guarda la posición de cada useState
   //* en una posición de memoria
 
