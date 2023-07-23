@@ -5,15 +5,40 @@ import { Square } from './components/Square.jsx'
 import { WinnerModal } from './components/WinnerModal.jsx'
 import { checkWinner, checkEndGame } from './logic/board.js'
 import { TURNS } from './constants.js'
+import { saveGameToStorage, resetGameStorage } from './logic/storage/index.js'
 import './App.css'
 
-
 function App() {
+  //* Los hoocks nunca pueden ir dentro de un if
+  //* porque react guarda la posición de cada useState
+  //* en una posición de memoria
+
+  // Leer datos del localStorage es lento, por tanto
+  // Se debe evitar a toda costa que en cada render se lea datos
+  // Por tanto, lo que vamos a hacer es pasarle una función al 
+  // useState para que use un estado u otro dependiendo de los datos
+
   // Crear el tablero y rellenarlo
   // Estado para guardar el click del jugador y se actualice
-  const [board, setBoard] = useState(Array(9).fill(null))
+  // Usamos una función dentro del useState para cargar la partida guardada o no
+  const [board, setBoard] = useState(() => {
+    const boardFromLocalStorage = window.localStorage.getItem('board')
 
-  const [turn, setTurn] = useState(TURNS.X)
+    if (boardFromLocalStorage) {
+      return JSON.parse(boardFromLocalStorage)
+    }
+
+    return Array(9).fill(null)
+  })
+
+  // Hacemos lo mismo que en el board
+  // Cargamos los turnos del local storage
+  // Si no hay turnos guardados, establece las x por defecto
+  const [turn, setTurn] = useState(() => {
+    const turnFromLocalStorage = window.localStorage.getItem('turn')
+    return turnFromLocalStorage ?? TURNS.X
+  })
+
   const [winner, setWinner] = useState(null)
   // null no hay ganador
   // false hay empate
@@ -23,6 +48,8 @@ function App() {
     setBoard(Array(9).fill(null))
     setTurn(TURNS.X)
     setWinner(null)
+
+    resetGameStorage()
   }
 
   const updateBoard = (index) => {
@@ -43,6 +70,11 @@ function App() {
     // cambiar el turno
     const newTurn = turn === TURNS.X ? TURNS.O : TURNS.X
     setTurn(newTurn)
+
+    saveGameToStorage({
+      board: newBoard,
+      turn: newTurn
+    })
 
     // revisar si hay un ganador
     const newWinner = checkWinner(newBoard)
