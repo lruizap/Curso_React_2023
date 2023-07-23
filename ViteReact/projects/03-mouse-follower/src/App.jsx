@@ -12,6 +12,8 @@ const FollowMouse = () => {
   // que cambie el parámetro (los que se encuentran dentro del array)
   // El useEffect está compuesto por una función y los parámetros que cambian
   //! useEffect(funcion(), [parametros, que, cambian])
+
+  //! EFECTO: POINTER MOVE
   useEffect(() => {
     console.log('effect', { enabled })
 
@@ -34,6 +36,17 @@ const FollowMouse = () => {
     // cleanup
     return () => {
       window.removeEventListener('pointermove', handleMove)
+    }
+
+  }, [enabled])
+
+  //! CHANGE BODY CLASSNAME
+  useEffect(() => {
+
+    document.body.classList.toggle('no-cursor', enabled)
+
+    return () => {
+      document.body.classList.remove('no-cursor')
     }
 
   }, [enabled])
